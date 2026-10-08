@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Faculty Login{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center" style="min-height: 70vh;">
+  <div class="col-md-6 col-lg-5">
+    <div class="glass-card">
+      <div class="text-center mb-4">
+        <div class="d-inline-flex p-3 rounded-circle mb-3" style="background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.3);">
+          <i class="bi bi-mortarboard-fill fs-1 text-primary"></i>
+        </div>
+        <h2 class="h3 fw-bold mb-1">Faculty Sign In</h2>
+        <p class="text-muted small">Sign in to evaluate handwritten student answer sheets</p>
+      </div>
+
+      <form method="POST" action="{{ url_for('login') }}" id="login-form">
+        <div class="mb-3">
+          <label for="email" class="form-label-custom">Faculty Email</label>
+          <div class="input-group">
+            <span class="input-group-text bg-transparent border-end-0" style="border-color: var(--border-color); color: var(--text-muted);">
+              <i class="bi bi-envelope"></i>
+            </span>
+            <input type="email" class="form-control-custom ps-2" id="email" name="email" value="faculty@pec.edu" placeholder="name@pec.edu" required>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label for="password" class="form-label-custom">Password</label>
+          <div class="input-group">
+            <span class="input-group-text bg-transparent border-end-0" style="border-color: var(--border-color); color: var(--text-muted);">
+              <i class="bi bi-lock"></i>
+            </span>
+            <input type="password" class="form-control-custom ps-2" id="password" name="password" value="faculty123" placeholder="••••••••" required>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary-gradient w-100 py-2 mb-3" id="login-submit-btn">
+          <i class="bi bi-box-arrow-in-right"></i> Sign In to Dashboard
+        </button>
+
+        <div class="text-center">
+          <button type="button" class="btn btn-secondary-glass w-100 py-2 small" id="quick-demo-login-btn" onclick="document.getElementById('email').value='faculty@pec.edu'; document.getElementById('password').value='demo123'; document.getElementById('login-form').submit();">
+            <i class="bi bi-lightning-charge-fill text-warning"></i> One-Click Demo Access
+          </button>
+        </div>
+      </form>
+
+      <div class="mt-4 pt-3 border-top text-center" style="border-color: var(--border-color) !important;">
+        <span class="badge badge-info-custom">
+          <i class="bi bi-shield-check"></i> Privacy Protected: Students never log in
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

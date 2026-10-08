@@ -1,0 +1,142 @@
+{
+  "users": {
+    "faculty_demo_01": {
+      "uid": "faculty_demo_01",
+      "email": "faculty@pec.edu",
+      "name": "Dr. Amandeep Kaur",
+      "role": "faculty"
+    }
+  },
+  "rubrics": {
+    "rubric_bfs_q1": {
+      "id": "rubric_bfs_q1",
+      "question_text": "Explain Breadth First Search (BFS) algorithm and state its time and space complexity.",
+      "model_answer": "Breadth First Search (BFS) is a graph traversal algorithm that begins at a source node and explores all immediate neighbors at the current depth level before moving on to vertices at the next depth level. It utilizes a Queue (FIFO) data structure to keep track of discovered vertices and a boolean visited array to prevent cycles. In an unweighted graph, BFS computes the shortest path from a source. Its time complexity is O(V + E) where V is the number of vertices and E is the number of edges, and auxiliary space is O(V) for the queue.",
+      "max_marks": 5.0,
+      "subject": "Data Structures & Algorithms",
+      "rubric_points": [
+        {
+          "id": "pt_1",
+          "text": "Defines level-by-level exploration starting from source vertex",
+          "marks": 2.0
+        },
+        {
+          "id": "pt_2",
+          "text": "Identifies Queue (FIFO) data structure and visited state tracking",
+          "marks": 1.5
+        },
+        {
+          "id": "pt_3",
+          "text": "States correct time complexity O(V + E) and space complexity O(V)",
+          "marks": 1.5
+        }
+      ],
+      "created_by": "faculty@pec.edu",
+      "created_at": "2026-10-08T10:00:00Z"
+    },
+    "rubric_30533f67": {
+      "id": "rubric_30533f67",
+      "question_text": "Explain QuickSort partition procedure and worst-case complexity.",
+      "model_answer": "QuickSort chooses a pivot and partitions the array such that elements smaller than pivot are on the left and larger on the right. Worst-case is O(n^2) when array is already sorted.",
+      "max_marks": 5.0,
+      "rubric_points": [
+        {
+          "id": "pt_1",
+          "text": "Describes pivot selection and partitioning into two subarrays",
+          "marks": 3.0
+        },
+        {
+          "id": "pt_2",
+          "text": "States worst-case time complexity as O(n^2)",
+          "marks": 2.0
+        }
+      ],
+      "subject": "Data Structures & Algorithms",
+      "created_by": "faculty@pec.edu",
+      "created_at": "2026-10-08T17:04:22.896141+00:00"
+    }
+  },
+  "sheets": {
+    "sheet_demo_01": {
+      "id": "sheet_demo_01",
+      "roll_no": "21103042",
+      "question_id": "Q1",
+      "rubric_id": "rubric_bfs_q1",
+      "subject": "Data Structures & Algorithms",
+      "image_url": "/uploads/sample_bfs_answer.jpg",
+      "raw_ocr_text": "Breadth First Search (BFS) is a fundamental graph traversal algorithm. It starts from a chosen root/source node and explores all neighboring vertices at the current depth level before proceeding to vertices at the next depth level. Key Characteristics: 1. Data Structure Used: It uses a Queue (First-In, First-Out / FIFO) to manage vertices that have been discovered but not fully processed. 2. Visited Array: Maintains a boolean array to track visited vertices and prevent loops. 3. Application: BFS reliably computes the single-source shortest path in unweighted graphs. Complexities: - Time Complexity: O(V + E) where V is total vertices and E is total edges. - Auxiliary Space: O(V) for queue storage in worst case.",
+      "corrected_text": "Breadth First Search (BFS) is a fundamental graph traversal algorithm. It starts from a chosen root/source node and explores all neighboring vertices at the current depth level before proceeding to vertices at the next depth level. Key Characteristics: 1. Data Structure Used: It uses a Queue (First-In, First-Out / FIFO) to manage vertices that have been discovered but not fully processed. 2. Visited Array: Maintains a boolean array to track visited vertices and prevent loops. 3. Application: BFS reliably computes the single-source shortest path in unweighted graphs. Complexities: - Time Complexity: O(V + E) where V is total vertices and E is total edges. - Auxiliary Space: O(V) for queue storage in worst case.",
+      "status": "evaluated",
+      "created_at": "2026-10-08T10:15:00Z",
+      "created_by": "faculty@pec.edu"
+    },
+    "sheet_8a016a17": {
+      "id": "sheet_8a016a17",
+      "roll_no": "21103099",
+      "question_id": "Q2",
+      "rubric_id": "rubric_30533f67",
+      "subject": "Data Structures & Algorithms",
+      "image_url": "/uploads/sheet_8a016a17.jpg",
+      "raw_ocr_text": "Breadth First Search (BFS) is a graph traversal algorithm that explores all vertices at the present depth level before moving on to vertices at the next depth level. It uses a Queue data structure (FIFO) to track vertices to visit. BFS finds the shortest path in an unweighted graph. Its time complexity is O(V + E) where V is the number of vertices and E is edges, and space complexity is O(V).",
+      "corrected_text": "QuickSort picks a pivot element and partitions the array into elements less than and greater than the pivot. In the worst case when the pivot is the smallest or largest element, its time complexity degrades to O(n^2).",
+      "status": "approved",
+      "created_at": "2026-10-08T17:04:22.899418+00:00",
+      "created_by": "faculty@pec.edu"
+    }
+  },
+  "scores": {
+    "sheet_demo_01": {
+      "sheet_id": "sheet_demo_01",
+      "roll_no": "21103042",
+      "question_id": "Q1",
+      "rubric_id": "rubric_bfs_q1",
+      "suggested_marks": 5.0,
+      "max_marks": 5.0,
+      "matched_points": [
+        {
+          "rubric_item_id": "pt_1",
+          "point_text": "Defines level-by-level exploration starting from source vertex",
+          "marks_awarded": 2.0,
+          "evidence": "starts from a chosen root/source node and explores all neighboring vertices at the current depth level before proceeding to vertices at the next depth level"
+        },
+        {
+          "rubric_item_id": "pt_2",
+          "point_text": "Identifies Queue (FIFO) data structure and visited state tracking",
+          "marks_awarded": 1.5,
+          "evidence": "uses a Queue (First-In, First-Out / FIFO) to manage vertices... Maintains a boolean array to track visited vertices"
+        },
+        {
+          "rubric_item_id": "pt_3",
+          "point_text": "States correct time complexity O(V + E) and space complexity O(V)",
+          "marks_awarded": 1.5,
+          "evidence": "Time Complexity: O(V + E) where V is total vertices and E is total edges. Auxiliary Space: O(V)"
+        }
+      ],
+      "missing_points": [],
+      "feedback": "Outstanding answer. The student comprehensively defined the exploration strategy, correctly identified the Queue data structure with visited tracking, and accurately stated both time and auxiliary space complexities.",
+      "confidence": 0.95,
+      "final_marks": 5.0,
+      "edited_flag": false,
+      "override_reason": null,
+      "approved_by": "faculty@pec.edu",
+      "approved_at": "2026-10-08T10:20:00Z"
+    },
+    "sheet_8a016a17": {
+      "sheet_id": "sheet_8a016a17",
+      "roll_no": "21103099",
+      "question_id": "Q2",
+      "rubric_id": "rubric_30533f67",
+      "suggested_marks": 2.0,
+      "max_marks": 5.0,
+      "matched_points": [],
+      "missing_points": [],
+      "feedback": "Graded and approved by faculty.",
+      "confidence": 1.0,
+      "final_marks": 2.0,
+      "edited_flag": false,
+      "override_reason": null,
+      "approved_by": "faculty@pec.edu",
+      "approved_at": "2026-10-08T17:04:22.928252+00:00"
+    }
+  }
+}

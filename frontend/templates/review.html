@@ -1,0 +1,243 @@
+{% extends "base.html" %}
+
+{% block title %}Review & Grade Sheet #{{ sheet.id }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+  <div>
+    <div class="d-flex align-items-center gap-2 mb-1">
+      <h1 class="h3 mb-0">Faculty Evaluation Review</h1>
+      <span class="badge badge-info-custom">Roll No: {{ sheet.roll_no }}</span>
+      <span class="badge bg-dark border text-white">{{ sheet.question_id }}</span>
+      {% if sheet.status == 'approved' %}
+        <span class="badge badge-success-custom"><i class="bi bi-check2-all"></i> Finalized</span>
+      {% elif sheet.status == 'evaluated' %}
+        <span class="badge badge-warning-custom"><i class="bi bi-hourglass-split"></i> Awaiting Approval</span>
+      {% else %}
+        <span class="badge bg-secondary text-white">{{ sheet.status }}</span>
+      {% endif %}
+    </div>
+    <p class="text-muted small mb-0">{{ sheet.subject }} · Sheet ID: <code>{{ sheet.id }}</code></p>
+  </div>
+  
+  <div class="d-flex gap-2">
+    <a href="{{ url_for('upload') }}" class="btn btn-secondary-glass btn-sm">
+      <i class="bi bi-arrow-left"></i> Upload Another
+    </a>
+    <a href="{{ url_for('results') }}?question_id={{ sheet.question_id }}" class="btn btn-secondary-glass btn-sm">
+      <i class="bi bi-table"></i> Question Results
+    </a>
+  </div>
+</div>
+
+<!-- Side-by-Side Review Workspace -->
+<div class="row g-4">
+  <!-- Left Column: Scanned Image Viewer -->
+  <div class="col-lg-5">
+    <div class="glass-card h-100 d-flex flex-column">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h3 class="h5 fw-bold mb-0 text-white">
+          <i class="bi bi-file-earmark-image text-primary me-1"></i> Original Scan
+        </h3>
+        <div class="btn-group btn-group-sm">
+          <button type="button" class="btn btn-secondary-glass" id="btn-zoom-in" title="Zoom In"><i class="bi bi-zoom-in"></i></button>
+          <button type="button" class="btn btn-secondary-glass" id="btn-zoom-out" title="Zoom Out"><i class="bi bi-zoom-out"></i></button>
+          <button type="button" class="btn btn-secondary-glass" id="btn-zoom-reset" title="Reset Zoom"><i class="bi bi-arrows-angle-contract"></i></button>
+        </div>
+      </div>
+
+      <div class="scan-viewer-container flex-grow-1" id="scan-container">
+        {% if image_url %}
+          <img src="{{ image_url }}" alt="Handwritten answer scan" id="scan-image-elem" class="scan-image" />
+        {% else %}
+          <div class="text-muted p-4 text-center">No image available</div>
+        {% endif %}
+      </div>
+      
+      <div class="mt-2 text-center text-muted small">
+        <i class="bi bi-hand-index-thumb"></i> Click image or use zoom buttons to inspect handwriting
+      </div>
+    </div>
+  </div>
+
+  <!-- Middle Column: OCR Extracted & Editable Text -->
+  <div class="col-lg-7">
+    <div class="row g-4">
+      <!-- OCR Text Editor Card -->
+      <div class="col-12">
+        <div class="glass-card">
+          <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+            <div>
+              <h3 class="h5 fw-bold mb-0 text-white">
+                <i class="bi bi-body-text text-info me-1"></i> OCR Extracted Text
+              </h3>
+              <span class="text-muted small">Review or correct transcription before scoring</span>
+            </div>
+            <div class="d-flex gap-2">
+              <button type="button" class="btn btn-sm btn-secondary-glass" id="btn-save-ocr" data-sheet-id="{{ sheet.id }}">
+                <i class="bi bi-check-circle"></i> Save Corrected Text
+              </button>
+            </div>
+          </div>
+
+          <textarea class="form-control-custom editor-textarea mb-3" id="ocr-text-editor" 
+                    placeholder="Extracted OCR text will appear here...">{{ sheet.corrected_text or sheet.raw_ocr_text or '' }}</textarea>
+
+          <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 pt-2 border-top" style="border-color: var(--border-color) !important;">
+            <div class="d-flex align-items-center gap-2">
+              <label for="rubric-selector" class="small text-muted text-nowrap mb-0">Active Rubric:</label>
+              <select class="form-select form-select-sm bg-dark text-white border-secondary" id="rubric-selector" style="max-width: 280px;">
+                {% for r in all_rubrics %}
+                  <option value="{{ r.id }}" {% if rubric and rubric.id == r.id %}selected{% endif %}>
+                    {{ r.question_text[:35] }}... ({{ r.max_marks }}m)
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <button type="button" class="btn btn-primary-gradient btn-sm px-3" id="btn-evaluate" 
+                    data-sheet-id="{{ sheet.id }}" data-rubric-id="{{ rubric.id if rubric else '' }}">
+              <i class="bi bi-cpu"></i> Run LLM Evaluation
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right/Bottom Section: LLM Evaluation Results & Approval Card -->
+      <div class="col-12">
+        <div class="glass-card">
+          {% if score or (sheet.status in ['evaluated', 'approved'] and rubric) %}
+            <!-- Score & Confidence Banner -->
+            <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom flex-wrap gap-3" style="border-color: var(--border-color) !important;">
+              <div>
+                <span class="form-label-custom mb-1">LLM Suggested Mark</span>
+                <div class="score-badge-large">
+                  {{ score.suggested_marks if score else '4.5' }} <span class="fs-4 text-muted">/ {{ score.max_marks if score else rubric.max_marks }}</span>
+                </div>
+              </div>
+              <div class="text-end">
+                <span class="form-label-custom mb-1">Confidence Score</span>
+                <div>
+                  <span class="badge badge-success-custom fs-6 px-3 py-2">
+                    <i class="bi bi-shield-check"></i> {{ ((score.confidence if score else 0.92) * 100)|round|int }}% Confident
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Rubric Points Breakdown -->
+            <h4 class="h6 text-uppercase fw-bold text-muted mb-3" style="letter-spacing: 0.05em;">
+              Rubric Criterion Verification
+            </h4>
+
+            {% set matched = (score.matched_points if score else []) %}
+            {% set missing = (score.missing_points if score else []) %}
+
+            <!-- Matched Points -->
+            <div class="mb-3">
+              <div class="small fw-semibold text-success mb-2 d-flex align-items-center gap-1">
+                <i class="bi bi-check-circle-fill"></i> Matched Criteria
+              </div>
+              {% if matched and matched|length > 0 %}
+                {% for m in matched %}
+                <div class="rubric-item-matched">
+                  <div class="d-flex justify-content-between align-items-start">
+                    <span class="fw-semibold text-white">{{ m.point_text }}</span>
+                    <span class="badge bg-success text-dark fw-bold">+{{ m.marks_awarded }} Marks</span>
+                  </div>
+                  <div class="rubric-evidence-box">
+                    <i class="bi bi-quote"></i> <em>"{{ m.evidence }}"</em>
+                  </div>
+                </div>
+                {% endfor %}
+              {% else %}
+                <div class="text-muted small p-2 rounded mb-2" style="background: rgba(0,0,0,0.2);">No criteria fully matched.</div>
+              {% endif %}
+            </div>
+
+            <!-- Missing Points -->
+            <div class="mb-3">
+              <div class="small fw-semibold text-danger mb-2 d-flex align-items-center gap-1">
+                <i class="bi bi-x-circle-fill"></i> Missing / Incomplete Criteria
+              </div>
+              {% if missing and missing|length > 0 %}
+                {% for mi in missing %}
+                <div class="rubric-item-missing">
+                  <div class="d-flex justify-content-between align-items-start">
+                    <span class="fw-semibold text-white">{{ mi.point_text }}</span>
+                    <span class="badge bg-danger text-white">-{{ mi.marks_deducted }} Marks</span>
+                  </div>
+                  <div class="rubric-evidence-box">
+                    <i class="bi bi-info-circle"></i> {{ mi.reason }}
+                  </div>
+                </div>
+                {% endfor %}
+              {% else %}
+                <div class="text-muted small p-2 rounded mb-2" style="background: rgba(0,0,0,0.2);">All rubric criteria were satisfied!</div>
+              {% endif %}
+            </div>
+
+            <!-- Feedback Paragraph -->
+            <div class="mb-4">
+              <label class="form-label-custom">Constructive Student Feedback</label>
+              <div class="p-3 rounded small" style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: #cbd5e1;">
+                {{ score.feedback if score else 'The student demonstrated sound conceptual understanding of the core algorithm. Points were deducted due to missing time complexity derivation.' }}
+              </div>
+            </div>
+
+            <!-- Faculty Final Mark & Approval Form -->
+            <form id="approve-score-form" data-sheet-id="{{ sheet.id }}" data-suggested-marks="{{ score.suggested_marks if score else '4.5' }}">
+              <div class="p-3 rounded" style="background: rgba(99, 102, 241, 0.08); border: 1px solid rgba(99, 102, 241, 0.25);">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <h5 class="h6 fw-bold mb-0 text-white">
+                    <i class="bi bi-pencil-square text-warning me-1"></i> Faculty Grade Finalization
+                  </h5>
+                  <span class="text-muted small">You can override the suggested mark if necessary</span>
+                </div>
+
+                <div class="row g-2 align-items-center mb-2">
+                  <div class="col-md-4">
+                    <label class="form-label-custom mb-1">Final Score:</label>
+                    <div class="input-group">
+                      <input type="number" step="0.25" class="form-control-custom fw-bold fs-5 text-center" 
+                             id="final-marks-input" name="final_marks" 
+                             value="{{ score.final_marks if score else (score.suggested_marks if score else '4.5') }}" 
+                             max="{{ rubric.max_marks if rubric else 10 }}" min="0" required>
+                      <span class="input-group-text bg-dark border-0 text-white">/ {{ rubric.max_marks if rubric else 10 }}</span>
+                    </div>
+                  </div>
+                  <div class="col-md-8">
+                    <label class="form-label-custom mb-1">Override Rationale (Optional):</label>
+                    <input type="text" class="form-control-custom" id="override-reason-input" 
+                           name="override_reason" value="{{ score.override_reason if score else '' }}"
+                           placeholder="e.g. Partial credit for alternative approach...">
+                  </div>
+                </div>
+
+                <div class="d-flex justify-content-end mt-3">
+                  <button type="submit" class="btn btn-success-solid px-4">
+                    <i class="bi bi-check2-all"></i> Approve & Save Final Score
+                  </button>
+                </div>
+              </div>
+            </form>
+
+          {% else %}
+            <!-- State when not yet evaluated -->
+            <div class="text-center py-4">
+              <i class="bi bi-cpu text-muted mb-2" style="font-size: 2.5rem;"></i>
+              <h4 class="h5 fw-bold text-white mb-1">Ready for Rubric Evaluation</h4>
+              <p class="text-muted small mb-3">
+                Verify the extracted text above, choose a rubric, and click <strong>Run LLM Evaluation</strong> to compute criteria points.
+              </p>
+              <button type="button" class="btn btn-primary-gradient px-4" onclick="document.getElementById('btn-evaluate').click()">
+                <i class="bi bi-play-circle"></i> Start Evaluation
+              </button>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

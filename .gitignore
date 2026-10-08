@@ -1,0 +1,39 @@
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv/
+
+# Environment Variables
+.env
+
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+
+# OS specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Server logs
+*.log
+
+# Keep sample image in uploads, but ignore dynamically uploaded files if needed
+uploads/sheet_*.jpg
+uploads/sheet_*.png
+uploads/sheet_*.jpeg
+uploads/pre_*.png

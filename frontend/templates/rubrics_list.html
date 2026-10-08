@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Evaluation Rubrics{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+  <div>
+    <h1 class="h2 mb-1">Grading Rubrics</h1>
+    <p class="text-muted small mb-0">Discrete checklist rubrics conditioned for accurate LLM grading</p>
+  </div>
+  <a href="{{ url_for('rubric_new') }}" class="btn btn-primary-gradient" id="btn-create-rubric">
+    <i class="bi bi-plus-lg"></i> Create New Rubric
+  </a>
+</div>
+
+{% if rubrics and rubrics|length > 0 %}
+<div class="row g-4">
+  {% for r in rubrics %}
+  <div class="col-md-6 col-lg-4">
+    <div class="glass-card h-100 d-flex flex-direction-column justify-content-between">
+      <div>
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <span class="badge badge-info-custom">{{ r.subject or 'Computer Science' }}</span>
+          <span class="badge badge-success-custom fw-bold fs-6">{{ r.max_marks }} Marks</span>
+        </div>
+
+        <h3 class="h5 fw-bold mb-2 text-white">{{ r.question_text }}</h3>
+        
+        <div class="mb-3">
+          <div class="form-label-custom mb-1">Model Answer</div>
+          <div class="p-2 rounded small text-muted text-truncate-2" style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); max-height: 80px; overflow-y: auto;">
+            {{ r.model_answer }}
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <div class="form-label-custom mb-1">Checklist Criteria ({{ r.rubric_points|length }} points)</div>
+          <ul class="list-unstyled mb-0 small">
+            {% for pt in r.rubric_points %}
+            <li class="d-flex justify-content-between py-1 border-bottom" style="border-color: rgba(255,255,255,0.05) !important;">
+              <span class="text-white text-truncate me-2">
+                <i class="bi bi-check2-circle text-primary me-1"></i> {{ pt.text }}
+              </span>
+              <span class="badge bg-dark text-white border-0">{{ pt.marks }}m</span>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+
+      <div class="pt-3 border-top mt-3" style="border-color: var(--border-color) !important;">
+        <a href="{{ url_for('upload') }}?rubric_id={{ r.id }}" class="btn btn-secondary-glass w-100 py-2 small">
+          <i class="bi bi-upload"></i> Upload Answer for this Rubric
+        </a>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="glass-card text-center py-5">
+  <div class="mb-3">
+    <i class="bi bi-card-checklist text-muted" style="font-size: 3.5rem;"></i>
+  </div>
+  <h3 class="h4 fw-bold">No Rubrics Defined Yet</h3>
+  <p class="text-muted col-md-6 mx-auto mb-4">
+    Per the rubric-conditioned evaluation design, fine-grained checklist rubrics yield significantly higher agreement with human faculty. Create your first rubric to get started.
+  </p>
+  <a href="{{ url_for('rubric_new') }}" class="btn btn-primary-gradient px-4">
+    <i class="bi bi-plus-lg"></i> Create First Rubric
+  </a>
+</div>
+{% endif %}
+{% endblock %}

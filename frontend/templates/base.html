@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Handwritten Answer Evaluator{% endblock %} | PEC Major Project</title>
+  
+  <!-- Bootstrap 5 CSS & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  
+  <!-- Custom Modern Styling -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <!-- Global Navigation Bar -->
+  <nav class="navbar navbar-expand-lg navbar-custom">
+    <div class="container-fluid">
+      <a class="navbar-brand d-flex align-items-center gap-2 text-white" href="{{ url_for('rubrics_list') if current_user else url_for('login') }}" id="nav-brand-logo">
+        <span class="fs-4 fw-bold" style="letter-spacing: -0.03em;">PEC Evaluator</span>
+        <span class="brand-badge">MVP</span>
+      </a>
+      
+      <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navContent">
+        <i class="bi bi-list fs-2"></i>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navContent">
+        {% if current_user %}
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-4">
+          <li class="nav-item">
+            <a class="nav-link nav-link-custom" href="{{ url_for('rubrics_list') }}" id="nav-rubrics">
+              <i class="bi bi-card-checklist me-1"></i> Rubrics
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link nav-link-custom" href="{{ url_for('rubric_new') }}" id="nav-new-rubric">
+              <i class="bi bi-plus-circle me-1"></i> New Rubric
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link nav-link-custom" href="{{ url_for('upload') }}" id="nav-upload">
+              <i class="bi bi-cloud-arrow-up me-1"></i> Upload Sheet
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link nav-link-custom" href="{{ url_for('results') }}" id="nav-results">
+              <i class="bi bi-bar-chart-line me-1"></i> Results & Export
+            </a>
+          </li>
+        </ul>
+
+        <div class="d-flex align-items-center gap-3">
+          <div class="text-end d-none d-md-block">
+            <div class="small fw-semibold text-white">{{ current_user.name or current_user.email }}</div>
+            <div class="small text-muted" style="font-size: 0.75rem;">Faculty Reviewer</div>
+          </div>
+          <a href="{{ url_for('logout') }}" class="btn btn-sm btn-secondary-glass" id="nav-logout-btn">
+            <i class="bi bi-box-arrow-right"></i> Sign Out
+          </a>
+        </div>
+        {% else %}
+        <div class="ms-auto">
+          <a href="{{ url_for('login') }}" class="btn btn-sm btn-primary-gradient" id="nav-login-btn">
+            <i class="bi bi-person-fill"></i> Faculty Login
+          </a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </nav>
+
+  <!-- Flash Messages Section -->
+  <main class="main-container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="container-fluid mb-4">
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category if category != 'error' else 'danger' }} alert-custom alert-dismissible fade show" role="alert">
+              <div>
+                {% if category == 'success' %}<i class="bi bi-check-circle-fill me-2"></i>{% endif %}
+                {% if category == 'danger' or category == 'error' %}<i class="bi bi-exclamation-triangle-fill me-2"></i>{% endif %}
+                {% if category == 'info' %}<i class="bi bi-info-circle-fill me-2"></i>{% endif %}
+                {{ message }}
+              </div>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Footer -->
+  <footer class="py-4 text-center border-top" style="border-color: var(--border-color) !important; background: rgba(11, 15, 25, 0.9);">
+    <div class="container text-muted small">
+      <p class="mb-1"><strong>Handwritten Answer Evaluator (MVP)</strong> · B.Tech CSE Major Project</p>
+      <p class="mb-0 text-subtle">Punjab Engineering College (Deemed to be University), Chandigarh · Supervisor: Dr. Amandeep Kaur</p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

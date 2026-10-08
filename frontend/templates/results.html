@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}Evaluation Results & Analytics{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+  <div>
+    <h1 class="h2 mb-1">Evaluation Results</h1>
+    <p class="text-muted small mb-0">Consolidated score sheet and LLM agreement audit trail</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{{ url_for('export_csv', question_id=selected_question) }}" class="btn btn-secondary-glass" id="btn-export-csv">
+      <i class="bi bi-file-earmark-spreadsheet text-success"></i> Export CSV
+    </a>
+    <a href="{{ url_for('upload') }}" class="btn btn-primary-gradient">
+      <i class="bi bi-upload"></i> Upload More Sheets
+    </a>
+  </div>
+</div>
+
+<!-- KPI Summary Cards -->
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3">
+    <div class="glass-card text-center py-3">
+      <div class="form-label-custom mb-1">Evaluated Sheets</div>
+      <div class="h3 fw-bold text-white mb-0">{{ metrics.total_count }}</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="glass-card text-center py-3">
+      <div class="form-label-custom mb-1">Class Average</div>
+      <div class="h3 fw-bold text-primary mb-0">{{ metrics.avg_score }}</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="glass-card text-center py-3">
+      <div class="form-label-custom mb-1">Faculty Overrides</div>
+      <div class="h3 fw-bold text-warning mb-0">{{ metrics.overridden_count }}</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="glass-card text-center py-3">
+      <div class="form-label-custom mb-1">LLM Agreement</div>
+      <div class="h3 fw-bold text-success mb-0">{{ metrics.agreement_rate }}%</div>
+    </div>
+  </div>
+</div>
+
+<!-- Filter Bar -->
+<div class="glass-card mb-4 p-3">
+  <form method="GET" action="{{ url_for('results') }}" class="row g-2 align-items-center">
+    <div class="col-auto">
+      <label class="form-label-custom mb-0"><i class="bi bi-funnel"></i> Filter by Question:</label>
+    </div>
+    <div class="col-auto">
+      <select name="question_id" class="form-select form-select-sm bg-dark text-white border-secondary" onchange="this.form.submit()">
+        <option value="">-- All Questions --</option>
+        {% for r in rubrics %}
+          <option value="{{ r.id }}" {% if selected_question == r.id %}selected{% endif %}>
+            {{ r.question_text[:40] }}...
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+    {% if selected_question %}
+    <div class="col-auto">
+      <a href="{{ url_for('results') }}" class="btn btn-sm btn-outline-secondary">Clear Filter</a>
+    </div>
+    {% endif %}
+  </form>
+</div>
+
+<!-- Results Table Card -->
+<div class="glass-card p-0 overflow-hidden">
+  {% if results and results|length > 0 %}
+  <div class="table-responsive">
+    <table class="table-custom">
+      <thead>
+        <tr>
+          <th>Roll No</th>
+          <th>Question ID</th>
+          <th>Suggested Mark</th>
+          <th>Final Mark</th>
+          <th>Faculty Action</th>
+          <th>Confidence</th>
+          <th>Approval Date</th>
+          <th class="text-end">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in results %}
+        <tr>
+          <td>
+            <span class="fw-bold text-white">{{ r.roll_no }}</span>
+          </td>
+          <td>
+            <span class="badge bg-dark border text-white">{{ r.question_id }}</span>
+          </td>
+          <td>
+            <span class="text-muted">{{ r.suggested_marks }} / {{ r.max_marks }}</span>
+          </td>
+          <td>
+            <span class="fw-bold fs-6 text-white">{{ r.final_marks }} / {{ r.max_marks }}</span>
+          </td>
+          <td>
+            {% if r.edited_flag %}
+              <span class="badge badge-warning-custom">
+                <i class="bi bi-pencil-fill me-1"></i> Overridden
+              </span>
+            {% else %}
+              <span class="badge badge-success-custom">
+                <i class="bi bi-check-all me-1"></i> Accepted
+              </span>
+            {% endif %}
+          </td>
+          <td>
+            <span class="small text-info">
+              {{ (r.confidence * 100)|round|int }}%
+            </span>
+          </td>
+          <td class="small text-muted">
+            {{ r.approved_at[:16]|replace('T', ' ') if r.approved_at else 'Recent' }}
+          </td>
+          <td class="text-end">
+            <a href="{{ url_for('review', sheet_id=r.sheet_id) }}" class="btn btn-sm btn-secondary-glass py-1 px-2" title="Review sheet details">
+              <i class="bi bi-eye"></i> View
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="text-center py-5">
+    <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+    <h4 class="h5 fw-bold text-white mt-2 mb-1">No Finalized Results Found</h4>
+    <p class="text-muted small mb-3">Answers will show up here once you review and approve their marks.</p>
+    <a href="{{ url_for('upload') }}" class="btn btn-primary-gradient btn-sm">
+      <i class="bi bi-upload"></i> Upload & Grade an Answer Sheet
+    </a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

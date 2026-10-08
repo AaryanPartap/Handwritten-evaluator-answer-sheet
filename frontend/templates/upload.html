@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Answer Sheet{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="mb-4">
+      <h1 class="h2 mb-1">Upload Answer Sheet</h1>
+      <p class="text-muted small mb-0">Upload scanned or photographed handwritten student answer</p>
+    </div>
+
+    <div class="glass-card">
+      <form method="POST" action="{{ url_for('upload') }}" enctype="multipart/form-data" id="upload-sheet-form">
+        <div class="row g-3 mb-4">
+          <div class="col-md-6">
+            <label for="roll_no" class="form-label-custom">Student Roll Number</label>
+            <input type="text" class="form-control-custom" id="roll_no" name="roll_no" placeholder="e.g. 21103042" value="21103042" required>
+            <div class="form-text text-muted small">Privacy preserved: student roll number only.</div>
+          </div>
+          <div class="col-md-6">
+            <label for="question_id" class="form-label-custom">Question Identifier</label>
+            <input type="text" class="form-control-custom" id="question_id" name="question_id" value="Q1" placeholder="e.g. Q1" required>
+          </div>
+        </div>
+
+        <div class="row g-3 mb-4">
+          <div class="col-md-6">
+            <label for="subject" class="form-label-custom">Subject</label>
+            <input type="text" class="form-control-custom" id="subject" name="subject" value="Data Structures & Algorithms" required>
+          </div>
+          <div class="col-md-6">
+            <label for="rubric_id" class="form-label-custom">Target Rubric</label>
+            <select class="form-control-custom" id="rubric_id" name="rubric_id" required>
+              {% if rubrics and rubrics|length > 0 %}
+                <option value="" disabled selected>-- Select Rubric --</option>
+                {% for r in rubrics %}
+                  <option value="{{ r.id }}" {% if request.args.get('rubric_id') == r.id %}selected{% endif %}>
+                    {{ r.question_text[:45] }}... ({{ r.max_marks }} Marks)
+                  </option>
+                {% endfor %}
+              {% else %}
+                <option value="" disabled selected>No rubrics found. Please create a rubric first.</option>
+              {% endif %}
+            </select>
+          </div>
+        </div>
+
+        <!-- Scanned File Drag and Drop Container -->
+        <div class="mb-4">
+          <label class="form-label-custom">Handwritten Answer Image</label>
+          <div class="p-4 text-center rounded border-dashed" style="border: 2px dashed var(--border-color); background: rgba(0,0,0,0.2); cursor: pointer;" onclick="document.getElementById('sheet_image').click();">
+            <div id="drop-preview-area">
+              <i class="bi bi-cloud-arrow-up text-primary" style="font-size: 3rem;"></i>
+              <h5 class="fw-bold mt-2 mb-1">Click or Drag & Drop Scan Image</h5>
+              <p class="text-muted small mb-0">PNG, JPG, JPEG supported. Single cropped answer region.</p>
+            </div>
+            <img id="image-preview" src="#" alt="Preview" class="img-fluid rounded mt-3 d-none" style="max-height: 250px; border: 1px solid var(--border-color);" />
+          </div>
+          <input type="file" class="d-none" id="sheet_image" name="sheet_image" accept="image/*" required onchange="previewSelectedImage(this)">
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center pt-3 border-top" style="border-color: var(--border-color) !important;">
+          <span class="text-muted small">
+            <i class="bi bi-info-circle"></i> TrOCR and OpenCV pipeline will extract text automatically upon upload.
+          </span>
+          <button type="submit" class="btn btn-primary-gradient px-4" id="upload-submit-btn">
+            <i class="bi bi-file-earmark-arrow-up"></i> Upload & Run OCR
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function previewSelectedImage(input) {
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const preview = document.getElementById('image-preview');
+      preview.src = e.target.result;
+      preview.classList.remove('d-none');
+      document.getElementById('drop-preview-area').classList.add('d-none');
+    }
+    reader.readAsFile(input.files[0]);
+  }
+}
+</script>
+{% endblock %}
