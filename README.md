@@ -2,9 +2,8 @@
 
 A rubric-based evaluation system for handwritten student answer sheets combining OCR, fine-grained rubric conditioning, and an LLM evaluator with a faculty-in-the-loop review dashboard.
 
-> **Punjab Engineering College (Deemed to be University), Chandigarh**  
-> **B.Tech CSE Major Project**  
-> **Supervisor:** Dr. Amandeep Kaur
+ 
+
 
 ---
 
